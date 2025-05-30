@@ -1,6 +1,7 @@
 # RealTalk - A Social Media Platform
 
-A modern social media platform built with React, Firebase, and Tailwind CSS where users can quickly share their thoughts and connect with others.
+RealTalk is a social media platform built for users to quickly share their thoughts and connect with others. Whether it's a random idea, a personal opinon, or just something on your mind, RealTalk gives you a space to share without filters. It is designed for quick and easy use, with a goal to keep things real! 
+
 
 ## Table of Contents
 - [Features](#features)
@@ -20,7 +21,7 @@ A modern social media platform built with React, Firebase, and Tailwind CSS wher
 - Protected routes
 - Modern UI with gradient accents
 
-## Tech Stack
+## Built With
 - **Frontend**: React.js with Vite
 - **Authentication**: Firebase Authentication
 - **Database**: Firebase Firestore
@@ -118,8 +119,8 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 This project is configured for deployment with Vercel. To deploy:
 
-1. Push your code to GitHub
-2. Visit [Vercel](https://vercel.com) and sign up/login with your GitHub account
+1. Push the code to GitHub
+2. Visit [Vercel](https://vercel.com) and sign up/login with GitHub account
 3. Click "Import Project"
 4. Select your repository
 5. Configure your project:
@@ -128,7 +129,7 @@ This project is configured for deployment with Vercel. To deploy:
    - Output Directory: `dist`
    - Install Command: `npm install`
 
-The project will automatically deploy and you'll get a production URL.
+The project will be deployed and a production URL is given.
 
 ### Automatic Deployments
 
