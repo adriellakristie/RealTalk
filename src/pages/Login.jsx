@@ -17,9 +17,29 @@ function Login() {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigate('/feed'); // Redirect to feed after successful login
+      navigate('/feed');
     } catch (err) {
-      setError(err.message);
+      console.log('Firebase Auth Error:', err.code); // Debug log
+      
+      if (err.code === 'auth/invalid-credential') {
+        setError(
+          <div>
+            Account not found or incorrect password. Would you like to{' '}
+            <Link to="/signup" className="text-blue-600 hover:text-blue-800 underline">
+              create an account
+            </Link>
+            ?
+          </div>
+        );
+      } else if (err.code === 'auth/invalid-email') {
+        setError('Please enter a valid email address.');
+      } else if (err.code === 'auth/missing-password') {
+        setError('Please enter your password.');
+      } else if (err.code === 'auth/too-many-requests') {
+        setError('Too many failed attempts. Please try again later.');
+      } else {
+        setError('Failed to sign in. Please check your email and password.');
+      }
     } finally {
       setLoading(false);
     }
@@ -64,7 +84,7 @@ function Login() {
           </div>
 
           {error && (
-            <div className="text-red-500 text-sm text-center">
+            <div className="text-red-500 text-sm text-center bg-red-50 p-3 rounded-md">
               {error}
             </div>
           )}
