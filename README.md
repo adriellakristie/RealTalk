@@ -1,4 +1,4 @@
-# RealTalk - A Social Media Platform
+# RealTalk 
 
 RealTalk is a social media platform built for users to quickly share their thoughts and connect with others. Whether it's a random idea, a personal opinon, or just something on your mind, RealTalk gives you a space to share without filters. It is designed for quick and easy use, with a goal to keep things real! 
 
