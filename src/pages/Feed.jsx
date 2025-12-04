@@ -2,7 +2,41 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth, db } from '../firebase';
 import { signOut } from 'firebase/auth';
-import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, Timestamp } from 'firebase/firestore';
+
+// Component to show time remaining until post expires
+function TimeRemaining({ expiresAt }) {
+  const [timeLeft, setTimeLeft] = useState('');
+  
+  useEffect(() => {
+    if (!expiresAt) return;
+    
+    const updateTime = () => {
+      const now = Date.now();
+      const expires = expiresAt.toMillis ? expiresAt.toMillis() : (typeof expiresAt === 'number' ? expiresAt : new Date(expiresAt).getTime());
+      const diff = expires - now;
+      
+      if (diff <= 0) {
+        setTimeLeft('Expired');
+        return;
+      }
+      
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      
+      setTimeLeft(`${hours}h ${minutes}m left`);
+    };
+    
+    updateTime();
+    const interval = setInterval(updateTime, 60000); // Update every minute
+    
+    return () => clearInterval(interval);
+  }, [expiresAt]);
+  
+  return timeLeft ? (
+    <span className="text-xs text-gray-400 ml-2">⏱️ {timeLeft}</span>
+  ) : null;
+}
 
 function Feed() {
   const navigate = useNavigate();
@@ -29,10 +63,10 @@ function Feed() {
           .filter(post => {
             // Filter out expired posts
             if (!post.expiresAt) return true; // Keep posts without expiration (old posts)
-            const expirationDate = post.expiresAt instanceof Date 
-              ? post.expiresAt 
-              : new Date(post.expiresAt);
-            return expirationDate > new Date();
+            
+            // Handle Firestore Timestamp
+            const expirationMs = post.expiresAt.toMillis ? post.expiresAt.toMillis() : post.expiresAt;
+            return expirationMs > Date.now();
           });
         setPosts(newPosts);
         console.log('Posts loaded successfully:', newPosts.length);
@@ -66,8 +100,8 @@ function Feed() {
     setError('');
     
     try {
-      const expirationTime = new Date();
-      expirationTime.setHours(expirationTime.getHours() + 24); // 24 hours from now
+      // Create expiration timestamp 24 hours from now using Firestore Timestamp
+      const expirationTime = Timestamp.fromMillis(Date.now() + 24 * 60 * 60 * 1000);
       
       const postData = {
         content: newPost.trim(),
@@ -121,7 +155,7 @@ function Feed() {
             <textarea
               value={newPost}
               onChange={(e) => setNewPost(e.target.value)}
-              placeholder="Share your thoughts..."
+              placeholder="Share your thoughts... (disappears in 24 hours)"
               className="w-full p-4 border border-purple-100 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-gray-700 placeholder-gray-400"
               rows="3"
             />
@@ -163,6 +197,7 @@ function Feed() {
                       month: 'long',
                       day: 'numeric'
                     })}
+                    <TimeRemaining expiresAt={post.expiresAt} />
                   </p>
                 </div>
               </div>
