@@ -21,10 +21,19 @@ function Feed() {
     const q = query(collection(db, 'posts'), orderBy('timestamp', 'desc'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       try {
-        const newPosts = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
+        const newPosts = snapshot.docs
+          .map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }))
+          .filter(post => {
+            // Filter out expired posts
+            if (!post.expiresAt) return true; // Keep posts without expiration (old posts)
+            const expirationDate = post.expiresAt instanceof Date 
+              ? post.expiresAt 
+              : new Date(post.expiresAt);
+            return expirationDate > new Date();
+          });
         setPosts(newPosts);
         console.log('Posts loaded successfully:', newPosts.length);
       } catch (error) {
@@ -57,12 +66,16 @@ function Feed() {
     setError('');
     
     try {
+      const expirationTime = new Date();
+      expirationTime.setHours(expirationTime.getHours() + 24); // 24 hours from now
+      
       const postData = {
         content: newPost.trim(),
         authorId: user.uid,
         authorEmail: user.email,
         timestamp: serverTimestamp(),
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        expiresAt: expirationTime
       };
       
       await addDoc(collection(db, 'posts'), postData);
