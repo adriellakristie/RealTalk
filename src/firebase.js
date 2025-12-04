@@ -3,7 +3,7 @@ import { getAuth } from 'firebase/auth';
 import { getAnalytics } from 'firebase/analytics';
 import { getFirestore } from 'firebase/firestore';
 
-// Your web app's Firebase configuration
+// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyAcnfzfIP_WNEO2EZ2kMVvrFxvZu9_-2_w",
   authDomain: "realtalk-bbd55.firebaseapp.com",
